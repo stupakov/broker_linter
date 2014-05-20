@@ -1,8 +1,10 @@
 require 'broker_client'
 require 'faraday'
 
+require 'spec_helper'
+
 describe 'authentication' do
-  let(:connection) { Faraday.new(url: 'http://localhost:9292') }
+  let(:connection) { Faraday.new(url: ENV['BROKER_HOST']) }
   let(:client) { BrokerClient.new(connection) }
 
   def self.validate_authentication

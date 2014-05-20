@@ -3,13 +3,14 @@ require 'json'
 require 'securerandom'
 require 'broker_client'
 
+require 'spec_helper'
+
 describe 'service broker lifecycle' do
   it 'can fetch catalog and create/bind/unbind/delete instances' do
-    username = 'admin'
-    password = 'password'
+    username = ENV['BROKER_USERNAME']
+    password = ENV['BROKER_PASSWORD']
 
-
-    connection = Faraday.new(url: 'http://localhost:9292')
+    connection = Faraday.new(url: ENV['BROKER_HOST'])
     connection.basic_auth(username, password)
 
     client = BrokerClient.new(connection)

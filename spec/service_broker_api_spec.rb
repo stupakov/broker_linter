@@ -1,6 +1,8 @@
 require 'faraday'
 require 'json'
 
+require 'spec_helper'
+
 describe 'service broker behavior' do
   def authenticate(username, password)
     connection.basic_auth(username, password)
@@ -10,7 +12,7 @@ describe 'service broker behavior' do
     connection.put("/v2/service_instances/#{id}")
   end
 
-  let(:connection) { Faraday.new(url: 'http://localhost:9292') }
+  let(:connection) { Faraday.new(url: ENV['BROKER_HOST']) }
 
   describe 'fetching the catalog (GET /v2/catalog)' do
     def fetch_catalog
@@ -18,8 +20,8 @@ describe 'service broker behavior' do
     end
 
     context 'when the credentials are good' do
-      let(:username) { 'admin' }
-      let(:password) { 'password' }
+      let(:username) { ENV['BROKER_USERNAME'] }
+      let(:password) { ENV['BROKER_PASSWORD'] }
 
       before {authenticate(username, password) }
 
