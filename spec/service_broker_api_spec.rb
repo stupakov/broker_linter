@@ -17,23 +17,6 @@ describe 'service broker behavior' do
       connection.get('/v2/catalog')
     end
 
-    context 'when there are no credentials' do
-      it 'returns a 401' do
-        response = fetch_catalog
-
-        expect(response.status).to eq(401)
-      end
-    end
-
-    context 'when the credentials are obviously wrong' do
-      it 'returns a 401' do
-        authenticate('badguy', 'yourpassword')
-        response = fetch_catalog
-
-        expect(response.status).to eq(401)
-      end
-    end
-
     context 'when the credentials are good' do
       let(:username) { 'admin' }
       let(:password) { 'password' }
@@ -63,23 +46,5 @@ describe 'service broker behavior' do
   end
 
   describe 'creating a service instance (PUT /v2/service_instances/:id)' do
-    let(:instance_id) { 1234 }
-
-    context 'when there are no credentials' do
-      it 'returns a 401' do
-        response = create_service_instance(instance_id)
-
-        expect(response.status).to eq(401)
-      end
-    end
-
-    context 'when the credentials are obviously wrong' do
-      it 'returns a 401' do
-        authenticate('badguy', 'yourpassword')
-        response = create_service_instance(instance_id)
-
-        expect(response.status).to eq(401)
-      end
-    end
   end
 end

@@ -4,7 +4,7 @@ require 'securerandom'
 require 'broker_client'
 
 describe 'service broker lifecycle' do
-  it 'has a happy path' do
+  it 'can fetch catalog and create/bind/unbind/delete instances' do
     username = 'admin'
     password = 'password'
 
@@ -14,9 +14,9 @@ describe 'service broker lifecycle' do
 
     client = BrokerClient.new(connection)
 
-    # FETCH CATALOG
-    catalog_response  = connection.get('/v2/catalog')
-    catalog = JSON.parse(catalog_response.body)
+    fetch_catalog_response = client.fetch_catalog
+    expect(fetch_catalog_response[:status]).to eq(200)
+    catalog = JSON.parse(fetch_catalog_response[:body])
 
     first_service = catalog.fetch("services").first
     first_service_id = first_service.fetch("id")
@@ -24,42 +24,41 @@ describe 'service broker lifecycle' do
     first_plan_id = first_plan.fetch("id")
 
 
-
     instance_id = "service-instance-#{SecureRandom.hex(4)}"
     binding_id = "service-binding-#{SecureRandom.hex(4)}"
 
 
     # CREATE INSTANCE
-    create_instance_status = client.create_instance({
+    create_instance_response = client.create_instance({
       instance_id: instance_id,
       service_id: first_service_id,
       plan_id: first_plan_id
     })
-    expect([201, 200]).to include(create_instance_status)
+    expect([201, 200]).to include(create_instance_response[:status])
 
 
     # BIND INSTANCE
-    bind_instance_status = client.bind_instance({
+    bind_instance_response = client.bind_instance({
       instance_id: instance_id,
       binding_id: binding_id,
       service_id: first_service_id,
       plan_id: first_plan_id,
     })
-    expect([201, 200]).to include(bind_instance_status)
+    expect([201, 200]).to include(bind_instance_response[:status])
 
 
     # UNBIND INSTANCE
-    unbind_instance_status = client.unbind_instance({
+    unbind_instance_response = client.unbind_instance({
       instance_id: instance_id,
       binding_id: binding_id,
     })
-    expect([410, 200]).to include(unbind_instance_status)
+    expect([410, 200]).to include(unbind_instance_response[:status])
 
 
     # DELETE INSTANCE
-    delete_instance_status = client.delete_instance({
+    delete_instance_response = client.delete_instance({
       instance_id: instance_id
     })
-    expect([410, 200]).to include(delete_instance_status)
+    expect([410, 200]).to include(delete_instance_response[:status])
   end
 end

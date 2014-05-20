@@ -1,7 +1,12 @@
+require 'json'
+
 class BrokerClient
   class Logger
     def log(message)
-      puts message
+    end
+
+    def info(message)
+      # puts ">>>#{message}"
     end
   end
 
@@ -10,8 +15,17 @@ class BrokerClient
     @logger = Logger.new
   end
 
+  def fetch_catalog
+    logger.info "Fetching catalog"
+    catalog_response = make_request(:get, '/v2/catalog', {})
+    {
+      status: catalog_response.status,
+      body: catalog_response.body
+    }
+  end
+
   def create_instance(options)
-    logger.log "\n\nCreating instance: #{options.inspect}"
+    logger.info"Creating instance: #{options.inspect}"
     instance_id = options.fetch(:instance_id)
     service_id = options.fetch(:service_id)
     plan_id = options.fetch(:plan_id)
@@ -25,11 +39,14 @@ class BrokerClient
 
     create_instance_response = make_request(:put, "/v2/service_instances/#{instance_id}", service_instance_attributes.to_json)
 
-    create_instance_response.status
+    {
+      status: create_instance_response.status,
+      body: create_instance_response.body
+    }
   end
 
   def bind_instance(options)
-    logger.log "\n\nBinding instance: #{options.inspect}"
+    logger.info "Binding instance: #{options.inspect}"
     instance_id = options.fetch(:instance_id)
     binding_id = options.fetch(:binding_id)
     service_id = options.fetch(:service_id)
@@ -46,11 +63,14 @@ class BrokerClient
       service_binding_attributes.to_json,
     )
 
-    bind_instance_response.status
+    {
+      status: bind_instance_response.status,
+      body: bind_instance_response.body
+    }
   end
 
   def unbind_instance(options)
-    logger.log "\n\nUnbinding instance: #{options.inspect}"
+    logger.info "Unbinding instance: #{options.inspect}"
 
     instance_id = options.fetch(:instance_id)
     binding_id = options.fetch(:binding_id)
@@ -61,11 +81,14 @@ class BrokerClient
       nil
     )
 
-    unbind_instance_response.status
+    {
+      status: unbind_instance_response.status,
+      body: unbind_instance_response.body
+    }
   end
 
   def delete_instance(options)
-    logger.log "\n\nDeleting instance: #{options.inspect}"
+    logger.info "Deleting instance: #{options.inspect}"
     instance_id = options.fetch(:instance_id)
 
     delete_instance_response = make_request(
@@ -74,7 +97,10 @@ class BrokerClient
       nil
     )
 
-    delete_instance_response.status
+    {
+      status: delete_instance_response.status,
+      body: delete_instance_response.body
+    }
   end
 
   private
